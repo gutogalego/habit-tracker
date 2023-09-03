@@ -7,7 +7,7 @@ import { api } from "~/utils/api";
 
 const habits = ["Read", "Meditate", "Sleep"];
 
-const getLast11Days = () =>{
+const getLast11Days = () => {
   const today = new Date();
   const last11Days = [];
 
@@ -18,17 +18,11 @@ const getLast11Days = () =>{
     // Move the date one day back for the next iteration
     today.setDate(day - 1);
   }
-  last11Days.reverse()
-  return last11Days
-}
+  last11Days.reverse();
+  return last11Days;
+};
 
 const DayCheckboxes = () => {
-
-
-  // Now, last11Days array contains the day numbers of the last 12 days, starting from today
-  
-
-
   return (
     <div className="form-control">
       <label className="label cursor-pointer justify-center">
@@ -64,15 +58,32 @@ export default function Home() {
           ))}
         </div>
 
-        {habits.map((habit, index) => (
-          <div
-            key={index}
-            className="grid h-16 w-full grid-cols-12 items-center"
-          >
-            <div className="w-40 pl-8">{habit}</div>
-            <DayCheckboxes />
+        <div>
+          {habits.map((habit, index) => (
+            <div
+              key={index}
+              className="grid h-16 w-full grid-cols-12 items-center"
+            >
+              <div className="w-40 pl-8">{habit}</div>
+
+              {last11Days.map((day, index) => (
+                <div key={index} className="form-control h-full items-center justify-center">
+                  <label className="label cursor-pointer justify-center h-2/3 w-2/3">
+                    <input
+                      type="checkbox"
+                      className="checkbox-success checkbox"
+                    />
+                  </label>
+                </div>
+              ))}
+            </div>
+          ))}
+          <div className="grid h-16 w-full grid-cols-12 items-center">
+            <div className="w-40 pl-8 text-neutral-400">
+              Add item
+            </div>
           </div>
-        ))}
+        </div>
       </main>
     </>
   );

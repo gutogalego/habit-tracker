@@ -22,12 +22,10 @@ const getLast11Days = () => {
   return last11Days;
 };
 
-const DayCheckboxes = () => {
+const CreateHabit = () => {
   return (
-    <div className="form-control">
-      <label className="label cursor-pointer justify-center">
-        <input type="checkbox" className="checkbox-success checkbox" />
-      </label>
+    <div className="grid h-16 w-full grid-cols-12 items-center">
+      <div className="w-40 pl-8 text-neutral-400">Add item</div>
     </div>
   );
 };
@@ -67,8 +65,11 @@ export default function Home() {
               <div className="w-40 pl-8">{habit}</div>
 
               {last11Days.map((day, index) => (
-                <div key={index} className="form-control h-full items-center justify-center">
-                  <label className="label cursor-pointer justify-center h-2/3 w-2/3">
+                <div
+                  key={index}
+                  className="form-control h-full items-center justify-center"
+                >
+                  <label className="label h-2/3 w-2/3 cursor-pointer justify-center">
                     <input
                       type="checkbox"
                       className="checkbox-success checkbox"
@@ -78,11 +79,7 @@ export default function Home() {
               ))}
             </div>
           ))}
-          <div className="grid h-16 w-full grid-cols-12 items-center">
-            <div className="w-40 pl-8 text-neutral-400">
-              Add item
-            </div>
-          </div>
+          <CreateHabit />
         </div>
       </main>
     </>

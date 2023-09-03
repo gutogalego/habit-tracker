@@ -1,3 +1,4 @@
+import { reverse } from "dns";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
@@ -5,12 +6,32 @@ import Link from "next/link";
 import { api } from "~/utils/api";
 
 const habits = ["Read", "Meditate", "Sleep"];
-const days = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
-const Ball = () => {
+const getLast11Days = () =>{
+  const today = new Date();
+  const last11Days = [];
+
+  for (let i = 0; i < 11; i++) {
+    const day = today.getDate();
+    last11Days.push(day);
+
+    // Move the date one day back for the next iteration
+    today.setDate(day - 1);
+  }
+  last11Days.reverse()
+  return last11Days
+}
+
+const DayCheckboxes = () => {
+
+
+  // Now, last11Days array contains the day numbers of the last 12 days, starting from today
+  
+
+
   return (
     <div className="form-control">
-      <label className="label cursor-pointer">
+      <label className="label cursor-pointer justify-center">
         <input type="checkbox" className="checkbox-success checkbox" />
       </label>
     </div>
@@ -19,6 +40,8 @@ const Ball = () => {
 
 export default function Home() {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
+
+  const last11Days = getLast11Days();
 
   return (
     <>
@@ -31,7 +54,7 @@ export default function Home() {
         <div className="grid grid-cols-12">
           <div></div>
 
-          {days.map((day, index) => (
+          {last11Days.map((day, index) => (
             <span
               key={index}
               className={`flex h-16 items-center justify-center`}
@@ -44,13 +67,10 @@ export default function Home() {
         {habits.map((habit, index) => (
           <div
             key={index}
-            className="grid grid-cols-12 h-16 w-full items-center bg-slate-400"
+            className="grid h-16 w-full grid-cols-12 items-center"
           >
-            <div className="w-40 bg-red-200 text-center">{habit}</div>
-            <Ball />
-            <Ball />
-            <Ball />
-            <Ball />
+            <div className="w-40 pl-8">{habit}</div>
+            <DayCheckboxes />
           </div>
         ))}
       </main>

@@ -1,4 +1,4 @@
-import { reverse } from "dns";
+import { useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
@@ -22,10 +22,39 @@ const getLast11Days = () => {
   return last11Days;
 };
 
+
 const CreateHabit = () => {
+  const [input, setInput] = useState("");
+
+  const { data: sessionData } = useSession();
+
+
+  const ctx = api.useContext();
+
+  const { mutate, isLoading: isPosting } = api.habits.create.useMutation({
+    onSuccess: () => {
+      setInput("");
+    },
+  });
+
   return (
     <div className="grid h-16 w-full grid-cols-12 items-center">
-      <div className="w-40 pl-8 text-neutral-400">Add item</div>
+      <input
+        placeholder="Add a new habit!"
+        className="w-40 grow bg-transparent pl-8 outline-none"
+        type="text"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (input != "") {
+              mutate({ habitName: input, userId: sessionData?.user.id ?? "no_user" });
+            }
+          }
+        }}
+        disabled={isPosting}
+      />
     </div>
   );
 };

@@ -5,7 +5,38 @@ import Link from "next/link";
 
 import { api } from "~/utils/api";
 
-const habits = ["Read", "Meditate", "Sleep"];
+export type habit = {
+  habitName: string;
+  userId: string;
+};
+
+const LoginComponent = () => {
+  const { data: sessionData } = useSession();
+
+  if (sessionData) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <button
+          className=" h-8 w-28 cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-slate-600 to-slate-500 text-sm font-medium text-white transition-opacity duration-300 hover:from-gray-500 hover:to-gray-600"
+          onClick={sessionData ? () => void signOut() : () => void signIn()}
+        >
+          Logout
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full w-full items-center justify-center">
+      <button
+        className="flex h-8 w-28 cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-neutral-600 to-neutral-500 text-sm font-medium text-white transition-opacity duration-300 hover:from-amber-500 hover:to-amber-600"
+        onClick={() => void signIn("google")}
+      >
+        Login
+      </button>
+    </div>
+  );
+};
 
 const getLast11Days = () => {
   const today = new Date();
@@ -22,18 +53,17 @@ const getLast11Days = () => {
   return last11Days;
 };
 
-
 const CreateHabit = () => {
   const [input, setInput] = useState("");
 
   const { data: sessionData } = useSession();
-
 
   const ctx = api.useContext();
 
   const { mutate, isLoading: isPosting } = api.habits.create.useMutation({
     onSuccess: () => {
       setInput("");
+      void ctx.habits.getHabitsByUserID.invalidate();
     },
   });
 
@@ -49,7 +79,10 @@ const CreateHabit = () => {
           if (e.key === "Enter") {
             e.preventDefault();
             if (input != "") {
-              mutate({ habitName: input, userId: sessionData?.user.id ?? "no_user" });
+              mutate({
+                habitName: input,
+                userId: sessionData?.user.id ?? "no_user",
+              });
             }
           }
         }}
@@ -60,7 +93,11 @@ const CreateHabit = () => {
 };
 
 export default function Home() {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+
+  const { data: sessionData } = useSession();
+  const {data: habits} = api.habits.getHabitsByUserID.useQuery({
+    userId: sessionData?.user.id ?? "no_user",
+  });
 
   const last11Days = getLast11Days();
 
@@ -73,7 +110,7 @@ export default function Home() {
       </Head>
       <main className="min-h-screen  divide-y-4 divide-dashed bg-neutral-100">
         <div className="grid grid-cols-12">
-          <div></div>
+          <LoginComponent />
 
           {last11Days.map((day, index) => (
             <span
@@ -86,12 +123,12 @@ export default function Home() {
         </div>
 
         <div>
-          {habits.map((habit, index) => (
+          {habits?.map((habit, index) => (
             <div
               key={index}
               className="grid h-16 w-full grid-cols-12 items-center"
             >
-              <div className="w-40 pl-8">{habit}</div>
+              <div className="w-40 pl-8">{habit.habitName}</div>
 
               {last11Days.map((day, index) => (
                 <div
@@ -115,26 +152,3 @@ export default function Home() {
   );
 }
 
-function AuthShowcase() {
-  const { data: sessionData } = useSession();
-
-  const { data: secretMessage } = api.example.getSecretMessage.useQuery(
-    undefined, // no input
-    { enabled: sessionData?.user !== undefined },
-  );
-
-  return (
-    <div className="flex flex-col items-center justify-center gap-4">
-      <p className="text-center text-2xl text-white">
-        {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-        {secretMessage && <span> - {secretMessage}</span>}
-      </p>
-      <button
-        className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-        onClick={sessionData ? () => void signOut() : () => void signIn()}
-      >
-        {sessionData ? "Sign out" : "Sign in"}
-      </button>
-    </div>
-  );
-}

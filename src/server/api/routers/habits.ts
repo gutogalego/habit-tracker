@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const userHabitRouter = createTRPCRouter({
   getHabitsByUserID: publicProcedure
@@ -28,7 +32,7 @@ export const userHabitRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       if (input.userId == "no_user") return [];
-      
+
       const userTopic = await ctx.prisma.userHabit.create({
         data: {
           habitName: input.habitName,
@@ -38,4 +42,28 @@ export const userHabitRouter = createTRPCRouter({
 
       return userTopic;
     }),
+
+  checkHabit: publicProcedure.input(
+    z.object({
+      done: z.boolean(),
+      date: z.date(),
+      habitId: z.string().min(1),
+      userId: z.string().min(1),
+    }),
+  ).mutation(async ({ctx, input}) => {
+
+    const habitCheck = await ctx.prisma.habitCheck.upsert({
+      where: {
+        userHabitId_date: { userHabitId: input.habitId, date: input.date },
+      },
+      update: { done: input.done },
+      create: {
+        userHabitId: input.habitId,
+        date: input.date,
+        done: input.done,
+      },
+    })
+    
+    return habitCheck
+  })
 });

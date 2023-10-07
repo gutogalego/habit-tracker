@@ -139,6 +139,7 @@ export default function Home() {
                     <input
                       type="checkbox"
                       className="checkbox-success checkbox"
+                      onChange={(e)=>{console.log(e)}}
                     />
                   </label>
                 </div>

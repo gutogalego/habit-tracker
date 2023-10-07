@@ -66,16 +66,17 @@ model VerificationToken {
 }
 
 model UserHabit {
+    id        String @id @default(cuid())
     habitName String
     userId    String
 
-    @@id([habitName, userId])
     @@index([userId])
 }
 
 model HabitCheck {
-    id          String   @id @default(cuid())
     userHabitId String
     date        DateTime @default(now()) @db.Date
     done        Boolean
+
+    @@id([userHabitId, date])
 }

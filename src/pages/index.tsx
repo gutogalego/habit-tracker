@@ -54,7 +54,6 @@ const getLast11Days = () => {
   return last11Days;
 };
 
-
 const CreateHabit = () => {
   const [input, setInput] = useState("");
 
@@ -62,12 +61,13 @@ const CreateHabit = () => {
 
   const ctx = api.useContext();
 
-  const { mutate: createHabit, isLoading: isCreatingHabit } = api.habits.create.useMutation({
-    onSuccess: () => {
-      setInput("");
-      void ctx.habits.getHabitsByUserID.invalidate();
-    },
-  });
+  const { mutate: createHabit, isLoading: isCreatingHabit } =
+    api.habits.create.useMutation({
+      onSuccess: () => {
+        setInput("");
+        void ctx.habits.getHabitsByUserID.invalidate();
+      },
+    });
 
   return (
     <div className="grid h-16 w-full grid-cols-12 items-center">
@@ -94,19 +94,54 @@ const CreateHabit = () => {
   );
 };
 
-export default function Home() {
-
+const HabitCheckerTable = (props: { last11Days: Date[] }) => {
   const { data: sessionData } = useSession();
-  const {data: habits} = api.habits.getHabitsByUserID.useQuery({
+  const { data: habits } = api.habits.getHabitsByUserID.useQuery({
     userId: sessionData?.user.id ?? "no_user",
   });
 
-  const { mutate: checkHabit, isLoading: isCheckingHabit } = api.habits.checkHabit.useMutation({
-    onSuccess: () => {
-      true
-    },
-  });
+  const { mutate: checkHabit, isLoading: isCheckingHabit } =
+    api.habits.checkHabit.useMutation({
+      onSuccess: () => {
+        true;
+      },
+    });
+  const last11Days = props.last11Days;
 
+  return (
+    <>
+      {habits?.map((habit, index) => (
+        <div key={index} className="grid h-16 w-full grid-cols-12 items-center">
+          <div className="w-40 pl-8">{habit.habitName}</div>
+
+          {last11Days.map((day, index) => (
+            <div
+              key={index}
+              className="form-control h-full items-center justify-center"
+            >
+              <label className="label h-2/3 w-2/3 cursor-pointer justify-center">
+                <input
+                  type="checkbox"
+                  className="checkbox-success checkbox"
+                  onChange={(e) => {
+                    checkHabit({
+                      date: day,
+                      userId: sessionData?.user.id ?? "no_user",
+                      done: e.target.checked,
+                      habitId: habit.id,
+                    });
+                  }}
+                />
+              </label>
+            </div>
+          ))}
+        </div>
+      ))}
+    </>
+  );
+};
+
+export default function Home() {
   const last11Days = getLast11Days();
 
   return (
@@ -131,35 +166,10 @@ export default function Home() {
         </div>
 
         <div>
-          {habits?.map((habit, index) => (
-            <div
-              key={index}
-              className="grid h-16 w-full grid-cols-12 items-center"
-            >
-              <div className="w-40 pl-8">{habit.habitName}</div>
-
-              {last11Days.map((day, index) => (
-                <div
-                  key={index}
-                  className="form-control h-full items-center justify-center"
-                >
-                  <label className="label h-2/3 w-2/3 cursor-pointer justify-center">
-                    <input
-                      type="checkbox"
-                      className="checkbox-success checkbox"
-                      onChange={(e)=>{
-                        checkHabit({date: day, userId: sessionData?.user.id ?? "no_user", done: e.target.checked, habitId: habit.id})
-                      }}
-                    />
-                  </label>
-                </div>
-              ))}
-            </div>
-          ))}
+          <HabitCheckerTable last11Days={last11Days} />
           <CreateHabit />
         </div>
       </main>
     </>
   );
 }
-

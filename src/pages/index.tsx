@@ -4,6 +4,7 @@ import Head from "next/head";
 import Link from "next/link";
 
 import { api } from "~/utils/api";
+import { HabitCheck } from "@prisma/client";
 
 export type habit = {
   habitName: string;
@@ -99,6 +100,19 @@ const HabitCheckerTable = (props: { last11Days: Date[] }) => {
   const { data: habits } = api.habits.getHabitsByUserID.useQuery({
     userId: sessionData?.user.id ?? "no_user",
   });
+
+  const { data: habitsAndChecks, isLoading } =
+    api.habits.getHabitsAndChecks.useQuery({
+      userId: sessionData?.user.id ?? "no_user",
+    });
+
+  if (habitsAndChecks) {
+    if ("checks" in habitsAndChecks) {
+      console.log(habitsAndChecks.checks);
+    }
+  }
+
+  console.log(habitsAndChecks);
 
   const { mutate: checkHabit, isLoading: isCheckingHabit } =
     api.habits.checkHabit.useMutation({

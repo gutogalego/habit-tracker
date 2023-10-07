@@ -43,15 +43,17 @@ const getLast11Days = () => {
   const last11Days = [];
 
   for (let i = 0; i < 11; i++) {
-    const day = today.getDate();
-    last11Days.push(day);
+    const date = new Date(today); // Create a new Date object with the same value as 'today'
+    last11Days.push(date);
 
     // Move the date one day back for the next iteration
+    const day = today.getDate();
     today.setDate(day - 1);
   }
   last11Days.reverse();
   return last11Days;
 };
+
 
 const CreateHabit = () => {
   const [input, setInput] = useState("");
@@ -60,7 +62,7 @@ const CreateHabit = () => {
 
   const ctx = api.useContext();
 
-  const { mutate, isLoading: isPosting } = api.habits.create.useMutation({
+  const { mutate: createHabit, isLoading: isCreatingHabit } = api.habits.create.useMutation({
     onSuccess: () => {
       setInput("");
       void ctx.habits.getHabitsByUserID.invalidate();
@@ -79,14 +81,14 @@ const CreateHabit = () => {
           if (e.key === "Enter") {
             e.preventDefault();
             if (input != "") {
-              mutate({
+              createHabit({
                 habitName: input,
                 userId: sessionData?.user.id ?? "no_user",
               });
             }
           }
         }}
-        disabled={isPosting}
+        disabled={isCreatingHabit}
       />
     </div>
   );
@@ -97,6 +99,12 @@ export default function Home() {
   const { data: sessionData } = useSession();
   const {data: habits} = api.habits.getHabitsByUserID.useQuery({
     userId: sessionData?.user.id ?? "no_user",
+  });
+
+  const { mutate: checkHabit, isLoading: isCheckingHabit } = api.habits.checkHabit.useMutation({
+    onSuccess: () => {
+      true
+    },
   });
 
   const last11Days = getLast11Days();
@@ -117,7 +125,7 @@ export default function Home() {
               key={index}
               className={`flex h-16 items-center justify-center`}
             >
-              {day}
+              {day.getDate()}
             </span>
           ))}
         </div>
@@ -139,7 +147,9 @@ export default function Home() {
                     <input
                       type="checkbox"
                       className="checkbox-success checkbox"
-                      onChange={(e)=>{console.log(e)}}
+                      onChange={(e)=>{
+                        checkHabit({date: day, userId: sessionData?.user.id ?? "no_user", done: e.target.checked, habitId: habit.id})
+                      }}
                     />
                   </label>
                 </div>

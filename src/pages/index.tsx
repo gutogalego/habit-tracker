@@ -90,23 +90,17 @@ const generateHabitCounts = (checks: Check[]) => {
   return counts;
 };
 
-const getColorForCount = (count: number): string => {
-  switch (count) {
-    case 0:
-      return "white";
-    case 1:
-      return "#e0f2e0"; // Very light green
-    case 2:
-      return "#b3e0b3"; // Lighter green
-    case 3:
-      return "#80cc80"; // Light green
-    case 4:
-      return "#4db84d"; // Medium green
-    case 5:
-      return "#1aa31a"; // Dark green
-    default:
-      return "#008000"; // Very dark green for >5
-  }
+const colorMapping: Record<number, string> = {
+  0: "bg-white",
+  1: "bg-green-100",
+  2: "bg-green-200",
+  3: "bg-green-300",
+  4: "bg-green-400",
+  5: "bg-green-500",
+};
+
+const getColorForCountTailwind = (count: number): string => {
+  return colorMapping[count] ?? "bg-green-600"; // Default to "bg-green-600" if count is above 5 or not found
 };
 
 const HabitGrid: React.FC<{ habitsAndChecks: HabitsAndChecks }> = ({
@@ -122,25 +116,15 @@ const HabitGrid: React.FC<{ habitsAndChecks: HabitsAndChecks }> = ({
   }, [habitsAndChecks]);
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(52, 10px)",
-        gridTemplateRows: "repeat(7, 10px)",
-        gap: "2px",
-      }}
-    >
+    <div className="grid-cols-52 grid-rows-7 grid gap-0.5">
       {getLast365Weeks().flatMap((week, weekIndex) =>
         week.map((day, dayIndex) => (
           <div
             key={`${weekIndex}-${dayIndex}`}
+            className={`h-2.5 w-2.5 rounded-sm ${getColorForCountTailwind(
+              habitCounts[day.toDateString()] ?? 0,
+            )}`}
             style={{
-              width: "10px",
-              height: "10px",
-              backgroundColor: getColorForCount(
-                habitCounts[day.toDateString()] ?? 0,
-              ),
-              borderRadius: "1px",
               gridColumn: weekIndex + 1,
               gridRow: dayIndex + 1,
             }}
@@ -333,9 +317,11 @@ export default function Home() {
             <CreateHabit />
           </div>
         </div>
+        <div className="max-w-2xl items-center justify-center">
         <HabitGrid
           habitsAndChecks={habitsAndChecks ?? { habits: [], checks: [] }}
         />
+        </div>
       </main>
     </>
   );

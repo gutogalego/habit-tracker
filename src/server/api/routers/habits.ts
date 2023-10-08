@@ -111,7 +111,7 @@ export const userHabitRouter = createTRPCRouter({
               userHabitId: habit.id,
               done: true
             },
-            take: 200,
+            take: 500,
           })
         );
       }

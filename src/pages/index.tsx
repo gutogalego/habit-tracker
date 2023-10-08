@@ -75,8 +75,6 @@ const getLast365Weeks = () => {
   return weeks;
 };
 
-
-
 const habitCountsForDate = (date: Date, checks: Check[]): number => {
   return checks.filter(
     (check) => new Date(check.date).toDateString() === date.toDateString(),
@@ -97,20 +95,19 @@ const getColorForCount = (count: number): string => {
     case 0:
       return "white";
     case 1:
-      return "#e0f2e0";  // Very light green
+      return "#e0f2e0"; // Very light green
     case 2:
-      return "#b3e0b3";  // Lighter green
+      return "#b3e0b3"; // Lighter green
     case 3:
-      return "#80cc80";  // Light green
+      return "#80cc80"; // Light green
     case 4:
-      return "#4db84d";  // Medium green
+      return "#4db84d"; // Medium green
     case 5:
-      return "#1aa31a";  // Dark green
+      return "#1aa31a"; // Dark green
     default:
-      return "#008000";  // Very dark green for >5
+      return "#008000"; // Very dark green for >5
   }
 };
-
 
 const HabitGrid: React.FC<{ habitsAndChecks: HabitsAndChecks }> = ({
   habitsAndChecks,
@@ -125,8 +122,15 @@ const HabitGrid: React.FC<{ habitsAndChecks: HabitsAndChecks }> = ({
   }, [habitsAndChecks]);
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(52, 10px)", gridTemplateRows: "repeat(7, 10px)", gap: "2px" }}>
-      {getLast365Weeks().flatMap((week, weekIndex) => 
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(52, 10px)",
+        gridTemplateRows: "repeat(7, 10px)",
+        gap: "2px",
+      }}
+    >
+      {getLast365Weeks().flatMap((week, weekIndex) =>
         week.map((day, dayIndex) => (
           <div
             key={`${weekIndex}-${dayIndex}`}
@@ -134,19 +138,17 @@ const HabitGrid: React.FC<{ habitsAndChecks: HabitsAndChecks }> = ({
               width: "10px",
               height: "10px",
               backgroundColor: getColorForCount(
-                habitCounts[day.toDateString()] ?? 0
+                habitCounts[day.toDateString()] ?? 0,
               ),
               borderRadius: "1px",
               gridColumn: weekIndex + 1,
-              gridRow: dayIndex + 1
+              gridRow: dayIndex + 1,
             }}
           ></div>
-        ))
+        )),
       )}
     </div>
   );
-  
-  
 };
 
 const getLast11Days = () => {
@@ -309,34 +311,32 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="min-h-screen bg-neutral-100">
-      <div className="divide-y-4 divide-dashed">
-        <div className="grid grid-cols-12">
-          <LoginComponent />
+        <div className="divide-y-4 divide-dashed">
+          <div className="grid grid-cols-12">
+            <LoginComponent />
 
-          {last11Days.map((day, index) => (
-            <span
-              key={index}
-              className={`flex h-16 items-center justify-center`}
-            >
-              {day.getDate()}
-            </span>
-          ))}
-        </div>
+            {last11Days.map((day, index) => (
+              <span
+                key={index}
+                className={`flex h-16 items-center justify-center`}
+              >
+                {day.getDate()}
+              </span>
+            ))}
+          </div>
 
-        <div>
-          <HabitCheckerTable
-            last11Days={last11Days}
-            habitsAndChecks={habitsAndChecks}
-          />
-          <CreateHabit />
-
-        </div>
+          <div>
+            <HabitCheckerTable
+              last11Days={last11Days}
+              habitsAndChecks={habitsAndChecks}
+            />
+            <CreateHabit />
+          </div>
         </div>
         <HabitGrid
-            habitsAndChecks={habitsAndChecks ?? { habits: [], checks: [] }}
-          />
+          habitsAndChecks={habitsAndChecks ?? { habits: [], checks: [] }}
+        />
       </main>
     </>
   );
 }
-

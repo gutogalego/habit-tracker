@@ -1,12 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
-import Link from "next/link";
-
 import { api } from "~/utils/api";
-import { HabitCheck } from "@prisma/client";
 
-export type habit = {
+export type Habit = {
   habitName: string;
   userId: string;
 };
@@ -106,21 +103,39 @@ const HabitCheckerTable = (props: { last11Days: Date[] }) => {
       userId: sessionData?.user.id ?? "no_user",
     });
 
-  if (habitsAndChecks) {
-    if ("checks" in habitsAndChecks) {
-      console.log(habitsAndChecks.checks);
-    }
-  }
-
-  console.log(habitsAndChecks);
-
-  const { mutate: checkHabit, isLoading: isCheckingHabit } =
+  const { mutate: checkHabit } =
     api.habits.checkHabit.useMutation({
       onSuccess: () => {
         true;
       },
     });
   const last11Days = props.last11Days;
+
+  const [checkedStates, setCheckedStates] = useState<
+    Map<string, Map<string, boolean>>
+  >(new Map());
+
+  useEffect(() => {
+    if (habitsAndChecks?.checks) {
+      const initialState = new Map<string, Map<string, boolean>>();
+
+      habits?.forEach((habit) => {
+        const habitMap = new Map<string, boolean>();
+        last11Days.forEach((day) => {
+          const isChecked = habitsAndChecks.checks.some(
+            (check) =>
+              check.userHabitId === habit.id &&
+              new Date(check.date).toDateString() === day.toDateString() &&
+              check.done,
+          );
+          habitMap.set(day.toDateString(), isChecked);
+        });
+        initialState.set(habit.id, habitMap);
+      });
+
+      setCheckedStates(initialState);
+    }
+  }, [habits, habitsAndChecks, last11Days]);
 
   return (
     <>
@@ -137,7 +152,19 @@ const HabitCheckerTable = (props: { last11Days: Date[] }) => {
                 <input
                   type="checkbox"
                   className="checkbox-success checkbox"
+                  checked={
+                    checkedStates.get(habit.id)?.get(day.toDateString()) ??
+                    false
+                  }
                   onChange={(e) => {
+                    const newState = new Map(checkedStates);
+                    const habitMap =
+                      newState.get(habit.id) ?? new Map<string, boolean>();
+                    habitMap.set(day.toDateString(), e.target.checked);
+                    newState.set(habit.id, habitMap);
+
+                    setCheckedStates(newState);
+
                     checkHabit({
                       date: day,
                       userId: sessionData?.user.id ?? "no_user",

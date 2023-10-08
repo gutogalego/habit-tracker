@@ -92,7 +92,7 @@ export const userHabitRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      if (input.userId == "no_user") return [];
+      if (input.userId == "no_user") return {habits: [], checks: []};
 
       const habits = await ctx.prisma.userHabit.findMany({
         where: {

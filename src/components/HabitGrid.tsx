@@ -30,7 +30,7 @@ const getColorForCountTailwind = (count: number): string => {
   return colorMapping[count] ?? "bg-green-600"; // Default to "bg-green-600" if count is above 5 or not found
 };
 
-export const HabitGrid: React.FC<{ habitsAndChecks: HabitsAndChecks; }> = ({
+export const HabitGrid: React.FC<{ habitsAndChecks: HabitsAndChecks }> = ({
   habitsAndChecks,
 }) => {
   const [habitCounts, setHabitCounts] = useState<Record<string, number>>({});
@@ -45,18 +45,19 @@ export const HabitGrid: React.FC<{ habitsAndChecks: HabitsAndChecks; }> = ({
   return (
     <div className="flex justify-center">
       <div className="grid-cols-52 grid-rows-7 grid ">
-        {getLast365Weeks().flatMap((week, weekIndex) => week.map((day, dayIndex) => (
-          <div
-            key={`${weekIndex}-${dayIndex}`}
-            className={` border h-2 w-2 sm:h-2.5 sm:w-2.5 md:h-3 md:w-3 lg:h-4 lg:w-4 xl:h-5 xl:w-5 rounded-sm ${getColorForCountTailwind(
-              habitCounts[day.toDateString()] ?? 0
-            )}`}
-            style={{
-              gridColumn: weekIndex + 1,
-              gridRow: dayIndex + 1,
-            }}
-          ></div>
-        ))
+        {getLast365Weeks().flatMap((week, weekIndex) =>
+          week.map((day, dayIndex) => (
+            <div
+              key={`${weekIndex}-${dayIndex}`}
+              className={` h-2 w-2 rounded-sm border sm:h-2.5 sm:w-2.5 md:h-3 md:w-3 lg:h-4 lg:w-4 xl:h-5 xl:w-5 ${getColorForCountTailwind(
+                habitCounts[day.toDateString()] ?? 0,
+              )}`}
+              style={{
+                gridColumn: weekIndex + 1,
+                gridRow: dayIndex + 1,
+              }}
+            ></div>
+          )),
         )}
       </div>
     </div>

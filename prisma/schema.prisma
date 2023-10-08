@@ -66,10 +66,10 @@ model VerificationToken {
 }
 
 model UserHabit {
-    @@id([habitName, userId])
     habitName String
     userId    String
 
+    @@id([habitName, userId])
     @@index([userId])
 }
 

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { api } from "~/utils/api";
@@ -49,8 +48,6 @@ const LoginComponent = () => {
     </div>
   );
 };
-
-
 
 export default function Home() {
   const last11Days = getLast11Days();

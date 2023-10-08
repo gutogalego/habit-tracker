@@ -4,6 +4,29 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 
+export const SkeletonHabitCheckerTable: React.FC<{ daysCount: number }> = ({ daysCount }) => {
+  return (
+    <div>
+      {/* Simulate multiple habits */}
+      {Array.from({ length: 3 }).map((_, idx) => (
+        <div key={idx} className="grid h-16 w-full grid-cols-12 items-center">
+          <div className="w-36 h-8 pl-8 bg-gray-300 animate-pulse mx-4"></div>
+
+          {Array.from({ length: daysCount }).map((_, dayIdx) => (
+            <div
+              key={dayIdx}
+              className="form-control h-full items-center justify-center"
+            >
+              <div className="h-2/5 w-1/6 bg-gray-300 rounded animate-pulse"></div>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+
 const CreateHabit = () => {
   const [input, setInput] = useState("");
 

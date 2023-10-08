@@ -2,7 +2,10 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { api } from "~/utils/api";
 import { getLast11Days } from "~/utils/helpers";
-import { HabitCheckerTable } from "~/components/HabitCheckerTable";
+import {
+  HabitCheckerTable,
+  SkeletonHabitCheckerTable,
+} from "~/components/HabitCheckerTable";
 import { HabitGrid } from "../components/HabitGrid";
 
 export type Habit = {
@@ -81,10 +84,14 @@ export default function Home() {
           </div>
 
           <div>
-            <HabitCheckerTable
-              last11Days={last11Days}
-              habitsAndChecks={habitsAndChecks}
-            />
+            {isLoading ? (
+              <SkeletonHabitCheckerTable daysCount={last11Days.length} />
+            ) : (
+              <HabitCheckerTable
+                last11Days={last11Days}
+                habitsAndChecks={habitsAndChecks}
+              />
+            )}
           </div>
         </div>
         <div className="flex items-center justify-center py-16">

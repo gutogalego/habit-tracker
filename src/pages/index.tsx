@@ -116,24 +116,28 @@ const HabitGrid: React.FC<{ habitsAndChecks: HabitsAndChecks }> = ({
   }, [habitsAndChecks]);
 
   return (
-    <div className="grid-cols-52 grid-rows-7 grid gap-0.5">
-      {getLast365Weeks().flatMap((week, weekIndex) =>
-        week.map((day, dayIndex) => (
-          <div
-            key={`${weekIndex}-${dayIndex}`}
-            className={`h-2.5 w-2.5 rounded-sm ${getColorForCountTailwind(
-              habitCounts[day.toDateString()] ?? 0,
-            )}`}
-            style={{
-              gridColumn: weekIndex + 1,
-              gridRow: dayIndex + 1,
-            }}
-          ></div>
-        )),
-      )}
+    <div className="flex justify-center">
+      <div className="grid-cols-52 grid-rows-7 grid ">
+        {getLast365Weeks().flatMap((week, weekIndex) =>
+          week.map((day, dayIndex) => (
+            <div
+              key={`${weekIndex}-${dayIndex}`}
+              className={` border h-2 w-2 sm:h-2.5 sm:w-2.5 md:h-3 md:w-3 lg:h-4 lg:w-4 xl:h-5 xl:w-5 rounded-sm ${getColorForCountTailwind(
+                habitCounts[day.toDateString()] ?? 0,
+              )}`}
+              style={{
+                gridColumn: weekIndex + 1,
+                gridRow: dayIndex + 1,
+              }}
+            ></div>
+          )),
+        )}
+      </div>
     </div>
   );
 };
+
+
 
 const getLast11Days = () => {
   const today = new Date();
@@ -317,10 +321,10 @@ export default function Home() {
             <CreateHabit />
           </div>
         </div>
-        <div className="max-w-2xl items-center justify-center">
-        <HabitGrid
-          habitsAndChecks={habitsAndChecks ?? { habits: [], checks: [] }}
-        />
+        <div className="flex items-center justify-center py-16">
+          <HabitGrid
+            habitsAndChecks={habitsAndChecks ?? { habits: [], checks: [] }}
+          />
         </div>
       </main>
     </>

@@ -3,21 +3,24 @@ import { type HabitsAndChecks } from "~/pages";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
+import { getLast11Days } from "~/utils/helpers";
 
-export const SkeletonHabitCheckerTable: React.FC<{ daysCount: number }> = ({ daysCount }) => {
+export const SkeletonHabitCheckerTable: React.FC<{ daysCount: number }> = ({
+  daysCount,
+}) => {
   return (
     <div>
       {/* Simulate multiple habits */}
       {Array.from({ length: 3 }).map((_, idx) => (
         <div key={idx} className="grid h-16 w-full grid-cols-12 items-center">
-          <div className="w-36 h-8 pl-8 bg-gray-300 animate-pulse mx-4"></div>
+          <div className="mx-4 h-8 w-36 animate-pulse bg-gray-300 pl-8"></div>
 
           {Array.from({ length: daysCount }).map((_, dayIdx) => (
             <div
               key={dayIdx}
               className="form-control h-full items-center justify-center"
             >
-              <div className="h-2/5 w-1/6 bg-gray-300 rounded animate-pulse"></div>
+              <div className="h-2/5 w-1/6 animate-pulse rounded bg-gray-300"></div>
             </div>
           ))}
         </div>
@@ -25,7 +28,6 @@ export const SkeletonHabitCheckerTable: React.FC<{ daysCount: number }> = ({ day
     </div>
   );
 };
-
 
 const CreateHabit = () => {
   const [input, setInput] = useState("");
@@ -68,7 +70,6 @@ const CreateHabit = () => {
 };
 
 export const HabitCheckerTable = (props: {
-  last11Days: Date[];
   habitsAndChecks: HabitsAndChecks | undefined;
 }) => {
   const habitsAndChecks = props.habitsAndChecks;
@@ -81,7 +82,7 @@ export const HabitCheckerTable = (props: {
       true;
     },
   });
-  const last11Days = props.last11Days;
+  const last11Days = getLast11Days();
 
   const [checkedStates, setCheckedStates] = useState<
     Map<string, Map<string, boolean>>

@@ -87,10 +87,7 @@ export default function Home() {
             {isLoading ? (
               <SkeletonHabitCheckerTable daysCount={last11Days.length} />
             ) : (
-              <HabitCheckerTable
-                last11Days={last11Days}
-                habitsAndChecks={habitsAndChecks}
-              />
+              <HabitCheckerTable habitsAndChecks={habitsAndChecks} />
             )}
           </div>
         </div>

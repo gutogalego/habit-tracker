@@ -1,7 +1,7 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { api } from "~/utils/api";
-import { getLast11Days } from "~/utils/helpers";
+import { getLastNDays } from "~/utils/helpers";
 import {
   HabitCheckerTable,
   SkeletonHabitCheckerTable,
@@ -53,7 +53,7 @@ const LoginComponent = () => {
 };
 
 export default function Home() {
-  const last11Days = getLast11Days();
+  const last11Days = getLastNDays(11);
 
   const { data: sessionData } = useSession();
   const { data: habitsAndChecks, isLoading } =

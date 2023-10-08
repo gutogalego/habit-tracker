@@ -3,7 +3,7 @@ import { type HabitsAndChecks } from "~/pages";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
-import { getLast11Days } from "~/utils/helpers";
+import { getLastNDays } from "~/utils/helpers";
 
 export const SkeletonHabitCheckerTable: React.FC<{ daysCount: number }> = ({
   daysCount,
@@ -82,7 +82,7 @@ export const HabitCheckerTable = (props: {
       true;
     },
   });
-  const last11Days = getLast11Days();
+  const last11Days = getLastNDays(11);
 
   const [checkedStates, setCheckedStates] = useState<
     Map<string, Map<string, boolean>>

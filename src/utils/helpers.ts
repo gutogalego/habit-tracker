@@ -1,4 +1,3 @@
-
 export const getLast365Weeks = () => {
   const weeks: Date[][] = [];
   const today = new Date();
@@ -13,7 +12,8 @@ export const getLast365Weeks = () => {
     weeks.unshift(week);
   }
   return weeks;
-};export const getLast365Days = () => {
+};
+export const getLast365Days = () => {
   const days = [];
   const today = new Date();
   for (let i = 0; i < 365; i++) {
@@ -23,11 +23,12 @@ export const getLast365Weeks = () => {
   }
   return days;
 };
-export const getLast11Days = () => {
+
+export const getLastNDays = (n = 11) => {
   const today = new Date();
   const last11Days = [];
 
-  for (let i = 0; i < 11; i++) {
+  for (let i = 0; i < n; i++) {
     const date = new Date(today); // Create a new Date object with the same value as 'today'
     last11Days.push(date);
 
@@ -38,4 +39,3 @@ export const getLast11Days = () => {
   last11Days.reverse();
   return last11Days;
 };
-

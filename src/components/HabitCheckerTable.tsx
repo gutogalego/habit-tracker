@@ -4,6 +4,45 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 
+const CreateHabit = () => {
+  const [input, setInput] = useState("");
+
+  const { data: sessionData } = useSession();
+
+  const ctx = api.useContext();
+
+  const { mutate: createHabit, isLoading: isCreatingHabit } =
+    api.habits.create.useMutation({
+      onSuccess: () => {
+        setInput("");
+        void ctx.habits.getHabitsAndChecks.invalidate();
+      },
+    });
+
+  return (
+    <div className="grid h-16 w-full grid-cols-12 items-center">
+      <input
+        placeholder="Add a new habit!"
+        className="w-40 grow bg-transparent pl-8 outline-none"
+        type="text"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (input != "") {
+              createHabit({
+                habitName: input,
+                userId: sessionData?.user.id ?? "no_user",
+              });
+            }
+          }
+        }}
+        disabled={isCreatingHabit}
+      />
+    </div>
+  );
+};
 
 export const HabitCheckerTable = (props: {
   last11Days: Date[];
@@ -33,13 +72,14 @@ export const HabitCheckerTable = (props: {
         const habitMap = new Map<string, boolean>();
         last11Days.forEach((day) => {
           const isChecked = habitsAndChecks.checks.some(
-            (check) => check.userHabitId === habit.id &&
+            (check) =>
+              check.userHabitId === `${habit.habitName}-${habit.userId}` &&
               new Date(check.date).toDateString() === day.toDateString() &&
-              check.done
+              check.done,
           );
           habitMap.set(day.toDateString(), isChecked);
         });
-        initialState.set(habit.id, habitMap);
+        initialState.set(`${habit.habitName}-${habit.userId}`, habitMap);
       });
 
       setCheckedStates(initialState);
@@ -61,13 +101,21 @@ export const HabitCheckerTable = (props: {
                 <input
                   type="checkbox"
                   className="checkbox-success checkbox"
-                  checked={checkedStates.get(habit.id)?.get(day.toDateString()) ??
-                    false}
+                  checked={
+                    checkedStates
+                      .get(`${habit.habitName}-${habit.userId}`)
+                      ?.get(day.toDateString()) ?? false
+                  }
                   onChange={(e) => {
                     const newState = new Map(checkedStates);
-                    const habitMap = newState.get(habit.id) ?? new Map<string, boolean>();
+                    const habitMap =
+                      newState.get(`${habit.habitName}-${habit.userId}`) ??
+                      new Map<string, boolean>();
                     habitMap.set(day.toDateString(), e.target.checked);
-                    newState.set(habit.id, habitMap);
+                    newState.set(
+                      `${habit.habitName}-${habit.userId}`,
+                      habitMap,
+                    );
 
                     setCheckedStates(newState);
 
@@ -75,14 +123,16 @@ export const HabitCheckerTable = (props: {
                       date: day,
                       userId: sessionData?.user.id ?? "no_user",
                       done: e.target.checked,
-                      habitId: habit.id,
+                      habitName: habit.habitName,
                     });
-                  } } />
+                  }}
+                />
               </label>
             </div>
           ))}
         </div>
       ))}
+      <CreateHabit />
     </>
   );
 };

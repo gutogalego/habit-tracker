@@ -9,7 +9,6 @@ import { HabitGrid } from "../components/HabitGrid";
 export type Habit = {
   habitName: string;
   userId: string;
-  id: string;
 };
 
 export type Check = {
@@ -51,45 +50,7 @@ const LoginComponent = () => {
   );
 };
 
-const CreateHabit = () => {
-  const [input, setInput] = useState("");
 
-  const { data: sessionData } = useSession();
-
-  const ctx = api.useContext();
-
-  const { mutate: createHabit, isLoading: isCreatingHabit } =
-    api.habits.create.useMutation({
-      onSuccess: () => {
-        setInput("");
-        void ctx.habits.getHabitsByUserID.invalidate();
-      },
-    });
-
-  return (
-    <div className="grid h-16 w-full grid-cols-12 items-center">
-      <input
-        placeholder="Add a new habit!"
-        className="w-40 grow bg-transparent pl-8 outline-none"
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            if (input != "") {
-              createHabit({
-                habitName: input,
-                userId: sessionData?.user.id ?? "no_user",
-              });
-            }
-          }
-        }}
-        disabled={isCreatingHabit}
-      />
-    </div>
-  );
-};
 
 export default function Home() {
   const last11Days = getLast11Days();
@@ -127,7 +88,6 @@ export default function Home() {
               last11Days={last11Days}
               habitsAndChecks={habitsAndChecks}
             />
-            <CreateHabit />
           </div>
         </div>
         <div className="flex items-center justify-center py-16">

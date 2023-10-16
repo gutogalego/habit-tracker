@@ -132,7 +132,6 @@ export const HabitCheckerTable = (props: {
                       ?.get(day.toDateString()) ?? false
                   }
                   onChange={(e) => {
-                    
                     const newState = new Map(checkedStates);
                     const habitMap =
                       newState.get(`${habit.habitName}-${habit.userId}`) ??

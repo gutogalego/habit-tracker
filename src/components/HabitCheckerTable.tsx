@@ -74,6 +74,7 @@ export const HabitCheckerTable = (props: {
 }) => {
   const habitsAndChecks = props.habitsAndChecks;
   const habits = habitsAndChecks?.habits;
+  const ctx = api.useContext();
 
   const { data: sessionData } = useSession();
 
@@ -131,6 +132,7 @@ export const HabitCheckerTable = (props: {
                       ?.get(day.toDateString()) ?? false
                   }
                   onChange={(e) => {
+                    
                     const newState = new Map(checkedStates);
                     const habitMap =
                       newState.get(`${habit.habitName}-${habit.userId}`) ??
@@ -149,6 +151,7 @@ export const HabitCheckerTable = (props: {
                       done: e.target.checked,
                       habitName: habit.habitName,
                     });
+                    void ctx.habits.getHabitsAndChecks.invalidate();
                   }}
                 />
               </label>
